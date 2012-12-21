@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="ie6"><![endif]-->
+<!--[if IE 7]><html class="ie7"><![endif]-->
+<!--[if IE 8]><html class="ie8"><![endif]-->
+<!--[if gt IE 8]><!--><html><!--<![endif]-->
+  <head>
+    <title>Media Center</title>
+    <meta http-equiv="Content-Type" content="text/html"; charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="main.css" rel="stylesheet" media="screen"/>
+  </head>
+
+  <body>
+
+    <div id="header">
+      <a id="menu-transfers" href="#transfers" class="button selected">Transfers</a>
+      <a id="menu-library" href="#library" class="button">Library</a>
+    </div>
+
+    <ul id="transfers">
+    </ul>
+
+    <ul id="library">
+    </ul>
+
+    <script src="jquery.js"></script>
+    <script src="main.js"></script>
+
+    <div id="fragments" style="display:none">
+
+      <li data-progress="100" id="fragment-transfer">
+			 <div class="name">No Name</div>
+       <div class="status"></div>
+       <div class="controls">
+         <p class="info"></p>
+         <button class="button start">Start</button>
+         <button class="button stop">Stop</button>
+       </div>
+		  </li>
+
+      <li id="fragment-movie">
+			 <div class="name">No Name</div>
+       <div class="status"></div>
+       <div class="controls">
+         <a href="#" class="button play">Play</a>
+       </div>
+		  </li>
+
+    </div>
+
+  </body>
+</html>
