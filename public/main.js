@@ -1,6 +1,6 @@
 $(document).ready(function() {
     var fragmentTransfer = $("#fragment-transfer").clone().removeAttr("id");
-    var fragmentMovie = $("#fragment-movie").clone().removeAttr("id");
+    var fragmentStream = $("#fragment-stream").clone().removeAttr("id");
 
     var reflow = function() {
         var fullWidth = $(window).width() / 100;
@@ -23,12 +23,12 @@ $(document).ready(function() {
         dom.find(".name").text(item.name);
         dom.find(".status").text(item.status);
         dom.find(".info").text(["up " + Math.round(item.up / 1024) + " K", "down " + Math.round(item.down / 1024) + " K", item.eta].join(" / "));
-        if (item.status != "stopped" && item.progress < 100) {
+        if (item.status != "stopped") {
             dom.addClass("active");
         } else {
             dom.removeClass("active");
         }
-        if (item.status == "stopped" && item.progress < 100) {
+        if (item.status == "stopped") {
             dom.addClass("paused");
         } else {
             dom.removeClass("paused");
@@ -48,24 +48,30 @@ $(document).ready(function() {
         });
     };
 
-    var updateMovieItem = function(item) {
-        var dom = $("[data-movie-id=" + item.id + "]");
+    var updateStreamItem = function(item) {
+        var dom = $("[data-stream-id=" + item.id + "]");
         if (!dom.get(0)) {
-            dom = fragmentMovie.clone();
+            dom = fragmentStream.clone();
             $("#library").append(dom);
         }
-        dom.attr("data-movie-id", item.id);
+        dom.attr("data-stream-id", item.id);
         dom.find(".name").text(item.title);
-        dom.find(".status").text(item.duration);
+        dom.find(".status").text(item.status);
+        dom.find(".play").attr("href", "/streams/" + item.id + "/stream.m3u8"); // TODO: Get this href from server side
+        if (item.status == "complete") {
+            dom.addClass("complete");
+        } else {
+            dom.removeClass("complete");
+        }
     };
 
     var updateLibrary = function() {
         $.ajax({
             dataType: 'json',
-            url: '/movies',
+            url: '/streams',
             success: function(data) {
                 $(data).each(function(_,item) {
-                    updateMovieItem(item);
+                    updateStreamItem(item);
                 });
             }
         });
@@ -86,9 +92,9 @@ $(document).ready(function() {
         var el = $(this);
         var target = $(event.target);
         if (!target.is(".controls, .controls > *")) {
-            var active = el.hasClass("selected");
+            var selected = el.hasClass("selected");
             $("ul li").removeClass("selected");
-            if (!active) {
+            if (!selected) {
                 el.addClass("selected").find(".controls").each(function() { this.scrollIntoView(); });
             }
         }

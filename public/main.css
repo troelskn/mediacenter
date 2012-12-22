@@ -1,7 +1,7 @@
 body {font-family:Helvetica;padding:0;margin:0}
 #library {display:none}
 ul {margin:80px 0 0;padding:0;list-style:none}
-li {border-bottom: 1px solid #ddd;padding:20px;background:#fff url(eee.png) repeat-y -2048px 0;position:relative}
+li {border-bottom: 1px solid #ddd;padding:20px;background:#fff url(eee.png) repeat-y -2048px 0;position:relative;cursor:pointer}
 li .name {font-size:20px}
 li .status {position:absolute;top:50%;right:20px;margin-top:-10px;font-size:16px;color:#888}
 li.selected .status {color:#ccc}
@@ -10,10 +10,10 @@ li.selected .controls {display:block;padding-top:20px}
 li.selected {background:#666;color:#fff}
 
 .button {display:inline-block;text-decoration:none;font-family:Helvetica;text-transform:uppercase;font-size:28px;font-weight:bold;padding:14px 28px;border:0;background:#009cff;color:#fff;text-align:center;border-radius:1px;margin-right:20px}
-#transfers li .stop, #transfers li .start {display:none}
-#transfers li.paused .start, #transfers li.active .stop {display:inline}
 .button.play {background:yellow;color:#333}
+li .stop, li .start, li .play {display:none}
+li.paused .start, li.active .stop, li.complete .play {display:inline-block}
 
-#header {position:fixed;top:0;left:0;z-index:5;width:100%;box-sizing:border-box;overflow:hidden;height:60px;padding:0 20px;background-color:#fff}
+#header {position:fixed;top:0;left:0;z-index:5;width:100%;box-sizing:border-box;overflow:hidden;height:80px;padding:0 20px;background-color:#fff;padding-bottom:20px}
 #header .button {float:left;box-sizing:border-box;width:50%;text-align:center;height:60px;line-height:60px;font-family:Helvetica;text-transform:uppercase;font-size:28px;font-weight:bold;padding:0;margin:0;background-color:#fff;color:#333}
 #header .button.selected {background:#009cff;color:#fff}
