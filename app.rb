@@ -3,7 +3,7 @@ require 'sinatra/async'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'boilerplate'
 require 'models'
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'transmission-client', 'lib'))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'vendor', 'transmission-client', 'lib'))
 require 'transmission-client'
 
 def stream_url(stream)
