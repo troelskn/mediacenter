@@ -123,11 +123,13 @@ class Movies
     @callbacks = { :all => [] }
   end
 
-  def all(&blk)
+  def all(options = {}, &blk)
     if @movies
       blk.call @movies
-    else
+    elsif options[:defer]
       @callbacks[:all] << blk
+    else
+      blk.call :unavailable
     end
   end
 
@@ -191,18 +193,24 @@ class Transfers
     initialize_poller!
   end
 
-  def all(&blk)
+  def all(options = {}, &blk)
     if @transfers
       blk.call @transfers
-    else
+    elsif options[:defer]
       @callbacks[:all] << blk
+    else
+      blk.call :unavailable
     end
   end
 
-  def find(id, &blk)
-    self.all do |transfers|
-      t = transfers.find { |t| t.id.to_i == id.to_i }
-      blk.call t if t
+  def find(id, options = {}, &blk)
+    self.all(options) do |transfers|
+      if transfers.is_a? Symbol
+        blok.call transfers
+      else
+        t = transfers.find { |t| t.id.to_i == id.to_i }
+        blk.call t if t
+      end
     end
   end
 
@@ -210,18 +218,26 @@ class Transfers
     @transfers = nil
   end
 
+  def add_torrent_by_file(data)
+    @transmission_client.add_torrent_by_file(data) do |resp|
+      yield resp if block_given?
+    end
+  end
+
   private
 
   def initialize_poller!
     EM.add_periodic_timer(1) do
       @transmission_client.torrents do |torrents|
-        @transfers = torrents.map do |tor|
-          t = Transfer.new(tor.id, tor.name, tor.download_dir, tor.status_name, tor.rate_download, tor.rate_upload, tor.percent_done, tor.eta_text)
-          t.connection, t.collection = @transmission_client, self
-          t
-        end
-        while @callbacks[:all].any?
-          @callbacks[:all].pop.call @transfers
+        unless torrents == :connection_error
+          @transfers = torrents.map do |tor|
+            t = Transfer.new(tor.id, tor.name, tor.download_dir, tor.status_name, tor.rate_download, tor.rate_upload, tor.percent_done, tor.eta_text)
+            t.connection, t.collection = @transmission_client, self
+            t
+          end
+          while @callbacks[:all].any?
+            @callbacks[:all].pop.call @transfers
+          end
         end
       end
     end

@@ -16,7 +16,6 @@ class App < Sinatra::Base
   configure do
     set :public_folder, Proc.new { File.join(root, "public") }
     set :streams_folder, Proc.new { File.join(root, "streams") }
-    set :logging, true
   end
 
   error do
@@ -25,8 +24,8 @@ class App < Sinatra::Base
 
   helpers do
 
-    def json(data)
-      status 200
+    def json(data, status_code = 200)
+      status status_code
       content_type :json
       body data.to_json
     end
@@ -58,9 +57,19 @@ class App < Sinatra::Base
     send_file File.expand_path('index.html', settings.public_folder)
   end
 
+  post '/transfers' do
+    transfers.add_torrent_by_file(params[:url]) do |response|
+      json(response)
+    end
+  end
+
   aget '/transfers' do
     transfers.all do |t|
-      json(t.map { |t| transfer_to_hash t })
+      if t.is_a? Symbol
+        json(t, 500)
+      else
+        json(t.map { |t| transfer_to_hash t })
+      end
     end
   end
 
@@ -97,6 +106,4 @@ class App < Sinatra::Base
     puts "Serving #{file_name}"
     send_file file_name, :type => 'video/MP2T', :disposition => nil
   end
-
-  run!
 end

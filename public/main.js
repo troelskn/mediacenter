@@ -4,18 +4,22 @@ $(document).ready(function() {
 
     var reflow = function() {
         var fullWidth = $(window).width() / 100;
-        $("#transfers li").each(function() {
+        $("#transfers li[data-progress]").each(function() {
             var el = $(this);
             var offset = Math.round(fullWidth * el.attr("data-progress")) - 2048;
             el.css({"background-position": offset + "px 0"});
         });
     };
 
+    var selectTransferItems = function() {
+        return $("#transfers li[data-transfer-id]");
+    };
+
     var updateTransferItem = function(item) {
         var dom = $("[data-transfer-id=" + item.id + "]");
         if (!dom.get(0)) {
             dom = fragmentTransfer.clone();
-            $("#transfers").append(dom);
+            $("#transfers").prepend(dom);
         }
         dom.attr("data-progress", item.progress);
         dom.attr("data-transfer-id", item.id);
@@ -40,9 +44,15 @@ $(document).ready(function() {
             dataType: 'json',
             url: '/transfers',
             success: function(data) {
+                var foundIds = [];
                 $(data).each(function(_,item) {
+                    foundIds.push(item.id);
                     updateTransferItem(item);
                 });
+                var removedItems = selectTransferItems().not(function() {
+                    return $.inArray(parseInt($(this).attr("data-transfer-id")), foundIds) > -1;
+                });
+                removedItems.remove();
                 reflow();
             }
         });
@@ -88,7 +98,7 @@ $(document).ready(function() {
         }
     }, 5000);
 
-    $("ul").delegate("li", "click", function(event) {
+    $("ul").delegate("li:not(.toolbar)", "click", function(event) {
         var el = $(this);
         var target = $(event.target);
         if (!target.is(".controls, .controls > *")) {
@@ -143,4 +153,27 @@ $(document).ready(function() {
         $("#library").show();
     });
 
+    $("#add-transfer-toggle").click(function() {
+        $(this).hide();
+        $("#add-transfer-text").val("");
+        $("#add-transfer-container").show();
+    });
+
+    $("#add-transfer-cancel").click(function() {
+        $("#add-transfer-container").hide();
+        $("#add-transfer-toggle").show();
+    });
+
+    $("#add-transfer-submit").click(function() {
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: '/transfers',
+            data: { url: $("#add-transfer-text").val() },
+            success: function() {
+                $("#add-transfer-container").hide();
+                $("#add-transfer-toggle").show();
+            }
+        });
+    });
 });
