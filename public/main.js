@@ -37,6 +37,10 @@ $(document).ready(function() {
         } else {
             dom.removeClass("paused");
         }
+        dom.find(".disabled").each(function() {
+            this.disabled = false;
+            $(this).removeClass("disabled");
+        });
     };
 
     var updateTransfers = function() {
@@ -111,30 +115,28 @@ $(document).ready(function() {
     });
 
     $("#transfers").delegate(".stop", "click", function() {
-        var el = $(this).closest("li");
+        var self = $(this);
+        var el = self.closest("li");
+        this.disabled = true;
+        self.addClass("disabled");
         $.ajax({
             type: 'PUT',
             dataType: 'json',
             url: '/transfers/' + el.attr("data-transfer-id"),
-            data: { status: "stop" },
-            success: function(item) {
-                updateTransferItem(item);
-                reflow();
-            }
+            data: { status: "stop" }
         });
     });
 
     $("#transfers").delegate(".start", "click", function() {
-        var el = $(this).closest("li");
+        var self = $(this);
+        var el = self.closest("li");
+        this.disabled = true;
+        self.addClass("disabled");
         $.ajax({
             type: 'PUT',
             dataType: 'json',
             url: '/transfers/' + el.attr("data-transfer-id"),
-            data: { status: "start" },
-            success: function(item) {
-                updateTransferItem(item);
-                reflow();
-            }
+            data: { status: "start" }
         });
     });
 
