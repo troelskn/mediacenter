@@ -1,6 +1,5 @@
 require 'sinatra/base'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'boilerplate'
 require 'models'
 require 'transmission_client'
 
@@ -13,6 +12,8 @@ class App < Sinatra::Base
   configure do
     set :public_folder, Proc.new { File.join(root, "public") }
     set :streams_folder, Proc.new { File.join(root, "streams") }
+    set :transfers, Transfers.new
+    set :streams, Streams.new(settings.streams_folder)
   end
 
   error do
@@ -28,11 +29,11 @@ class App < Sinatra::Base
     end
 
     def transfers
-      Globals.transfers ||= Transfers.new
+      settings.transfers
     end
 
     def streams
-      Globals.streams ||= Streams.new(settings.streams_folder)
+      settings.streams
     end
 
     def transfer_to_hash(t)

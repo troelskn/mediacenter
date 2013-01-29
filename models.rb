@@ -1,8 +1,22 @@
 require 'pathname'
 require 'fileutils'
 
+# http://ruhe.tumblr.com/post/565540643/generate-json-from-ruby-struct
+module HashableStruct
+  def to_map
+    map = Hash.new
+    self.members.each { |m| map[m] = self[m] }
+    map
+  end
+
+  def to_json(*a)
+    self.to_map.to_json(*a)
+  end
+end
+
 module FFmpeg
   class ProbeResult < Struct.new(:path, :duration, :title)
+    include HashableStruct
     def name
       self.title || (self.path.dirname.basename.to_s + "/" + self.path.basename.to_s)
     end
@@ -24,6 +38,7 @@ end
 class Streams
 
   class Stream < Struct.new(:id, :path, :source, :title, :status)
+    include HashableStruct
     def initial?
       self.status == "initial"
     end
@@ -112,6 +127,7 @@ end
 class Movies
 
   class Movie < Struct.new(:id, :path, :title, :duration)
+    include HashableStruct
   end
 
   def initialize(folder)
@@ -149,6 +165,8 @@ end
 class Transfers
 
   class Transfer < Struct.new(:id, :name, :download_dir, :status, :down, :up, :progress, :eta)
+    include HashableStruct
+
     def connection=(conn)
       @connection = conn
     end
