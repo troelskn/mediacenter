@@ -1,3 +1,0 @@
-[submodule "vendor/transmission-client"]
-	path = vendor/transmission-client
-	url = git@github.com:troelskn/transmission-client.git
