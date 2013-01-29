@@ -1,5 +1,4 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'boilerplate'
 require 'models'
 require 'transmission_client'
 
