@@ -3,10 +3,6 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'models'
 require 'transmission_client'
 
-def stream_url(stream)
-  "streams/#{stream.id}/stream.m3u8"
-end
-
 class App < Sinatra::Base
 
   configure do
