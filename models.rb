@@ -1,5 +1,6 @@
 require 'pathname'
 require 'fileutils'
+require 'digest/md5'
 
 # http://ruhe.tumblr.com/post/565540643/generate-json-from-ruby-struct
 module HashableStruct
