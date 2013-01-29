@@ -1,17 +1,14 @@
 require 'sinatra/base'
-require 'sinatra/async'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'boilerplate'
 require 'models'
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'vendor', 'transmission-client', 'lib'))
-require 'transmission-client'
+require 'transmission_client'
 
 def stream_url(stream)
   "streams/#{stream.id}/stream.m3u8"
 end
 
 class App < Sinatra::Base
-  register Sinatra::Async
 
   configure do
     set :public_folder, Proc.new { File.join(root, "public") }
@@ -58,39 +55,30 @@ class App < Sinatra::Base
   end
 
   post '/transfers' do
-    transfers.add_torrent_by_file(params[:url]) do |response|
-      json(response)
+    result = transfers.add_torrent_by_file(params[:url])
+    if params[:redirect]
+      redirect "/"
+    else
+      json result
     end
   end
 
-  aget '/transfers' do
-    transfers.all do |t|
-      if t.is_a? Symbol
-        json(t, 500)
-      else
-        json(t.map { |t| transfer_to_hash t })
-      end
-    end
+  get '/transfers' do
+    json transfers.all.map { |t| transfer_to_hash t }
   end
 
-  aget '/transfers/:id' do |id|
-    transfers.find(id) do |t|
-      json transfer_to_hash(t)
-    end
+  get '/transfers/:id' do |id|
+    json transfer_to_hash(transfers.find(id))
   end
 
-  aput '/transfers/:id' do |id|
-    transfers.find(id) do |t|
-      method = params[:status] == 'stop' ? :stop! : :start!
-      t.send(method) do
-        transfers.find(id) do |t|
-          json transfer_to_hash(t)
-        end
-      end
-    end
+  put '/transfers/:id' do |id|
+    t = transfers.find(id)
+    method = params[:status] == 'stop' ? :stop! : :start!
+    t.send(method)
+    json({:status => "ok"})
   end
 
-  aget '/streams' do
+  get '/streams' do
     json streams.all.select { |s| s.complete? }.map { |s| stream_to_hash s }
   end
 

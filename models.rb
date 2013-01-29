@@ -83,15 +83,13 @@ class Encoder
   end
 
   def queue_transfers
-    @transfers.all do |t|
-      t.each do |t|
-        if t.progress == 100
-          t.movie_files.each do |m|
-            unless @streams.find_by_path(m)
-              puts "Creating new stream"
-              s = @streams.create(m)
-              @streams.save! s
-            end
+    @transfers.all.each do |t|
+      if t.progress == 100
+        t.movie_files.each do |m|
+          unless @streams.find_by_path(m)
+            puts "Creating new stream"
+            s = @streams.create(m)
+            @streams.save! s
           end
         end
       end
@@ -120,36 +118,32 @@ class Movies
     @folder = folder
     @movies = nil
     initialize_poller!
-    @callbacks = { :all => [] }
   end
 
-  def all(options = {}, &blk)
-    if @movies
-      blk.call @movies
-    elsif options[:defer]
-      @callbacks[:all] << blk
-    else
-      blk.call :unavailable
-    end
+  def all
+    @movies
   end
 
   private
 
   def initialize_poller!
-    EM.add_periodic_timer(3) do
-      paths = Dir.glob("#{@folder}/**/*").select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv)$/) }.map { |f| Pathname.new(f) }
-      @movies = paths.map do |path|
-        probe = FFmpeg.probe(path)
-        rel_path = File.join(path.dirname.basename, path.basename)
-        id = Digest::MD5.hexdigest(rel_path)
-        Movie.new(id, rel_path, probe.name, probe.duration)
-      end
-      while @callbacks[:all].any?
-        @callbacks[:all].pop.call @movies
+    Thread.new do
+      while true
+        begin
+          paths = Dir.glob("#{@folder}/**/*").select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv)$/) }.map { |f| Pathname.new(f) }
+          @movies = paths.map do |path|
+            probe = FFmpeg.probe(path)
+            rel_path = File.join(path.dirname.basename, path.basename)
+            id = Digest::MD5.hexdigest(rel_path)
+            Movie.new(id, rel_path, probe.name, probe.duration)
+          end
+        rescue Exception => e
+          p e
+        end
+        sleep 3
       end
     end
   end
-
 end
 
 class Transfers
@@ -188,57 +182,42 @@ class Transfers
 
   def initialize(host = '127.0.0.1', port = 9091)
     @transfers = nil
-    @transmission_client = Transmission::Client.new(host, port)
-    @callbacks = { :all => [] }
+    @transmission_client = TransmissionClient::Client.new(host, port)
     initialize_poller!
   end
 
-  def all(options = {}, &blk)
-    if @transfers
-      blk.call @transfers
-    elsif options[:defer]
-      @callbacks[:all] << blk
-    else
-      blk.call :unavailable
-    end
+  def all
+    @transfers || []
   end
 
-  def find(id, options = {}, &blk)
-    self.all(options) do |transfers|
-      if transfers.is_a? Symbol
-        blok.call transfers
-      else
-        t = transfers.find { |t| t.id.to_i == id.to_i }
-        blk.call t if t
-      end
-    end
+  def find(id)
+    @transfers.find { |t| t.id.to_i == id.to_i } if @transfers.any?
   end
 
   def invalidate!
     @transfers = nil
   end
 
-  def add_torrent_by_file(data)
-    @transmission_client.add_torrent_by_file(data) do |resp|
-      yield resp if block_given?
-    end
+  def add_torrent_by_file(url)
+    @transmission_client.add_torrent_by_url(url)
   end
 
   private
 
   def initialize_poller!
-    EM.add_periodic_timer(1) do
-      @transmission_client.torrents do |torrents|
-        unless torrents == :connection_error
-          @transfers = torrents.map do |tor|
+    Thread.new do
+      while true
+        begin
+          @transfers = @transmission_client.torrents.map do |tor|
             t = Transfer.new(tor.id, tor.name, tor.download_dir, tor.status_name, tor.rate_download, tor.rate_upload, tor.percent_done, tor.eta_text)
             t.connection, t.collection = @transmission_client, self
             t
           end
-          while @callbacks[:all].any?
-            @callbacks[:all].pop.call @transfers
-          end
+        rescue Exception => e
+          puts e.class.to_s + ": " + e.message
+          puts e.backtrace.join("\n")
         end
+        sleep 1
       end
     end
   end
