@@ -87,13 +87,13 @@ module TransmissionClient
     ATTRIBUTES = ATTRIBUTES_READONLY + ['bandwidthPriority', 'downloadLimit', 'downloadLimited', 'files-wanted', 'files-unwanted', 'honorsSessionLimits', 'ids', 'location', 'peer-limit', 'priority-high', 'priority-low', 'priority-normal', 'seedRatioLimit', 'seedRatioMode', 'uploadLimit', 'uploadLimited']
     attr_reader :attributes
     STATUS = {
-	    0 => :stopped,
-	    1 => :check_wait,
-	    2 => :check,
-	    3 => :download_wait,
-	    4 => :download,
-	    5 => :seed_wait,
-	    6 => :seed
+      0 => :stopped,
+      1 => :check_wait,
+      2 => :check,
+      3 => :download_wait,
+      4 => :download,
+      5 => :seed_wait,
+      6 => :seed
     }
 
     def initialize(attributes, connection)
