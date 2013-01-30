@@ -244,6 +244,10 @@ class Transfers
     @transmission_client.add_torrent_by_url(url)
   end
 
+  def delete(torrents)
+    raise "TODO"
+  end
+
   private
 
   def initialize_poller!

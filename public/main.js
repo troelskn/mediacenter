@@ -27,7 +27,7 @@ $(document).ready(function() {
         dom.find(".name").text(item.name);
         dom.find(".status").text(item.status);
         dom.find(".info").text(["up " + Math.round(item.up / 1024) + " K", "down " + Math.round(item.down / 1024) + " K", item.eta].join(" / "));
-        if (item.status != "stopped") {
+        if (item.status == "download") {
             dom.addClass("active");
         } else {
             dom.removeClass("active");
@@ -137,6 +137,36 @@ $(document).ready(function() {
             dataType: 'json',
             url: '/transfers/' + el.attr("data-transfer-id"),
             data: { status: "start" }
+        });
+    });
+
+    $("#transfers").delegate(".delete", "click", function() {
+        if (!confirm("Are you sure you want to delete this?")) {
+            return;
+        }
+        var self = $(this);
+        var el = self.closest("li");
+        this.disabled = true;
+        self.addClass("disabled");
+        $.ajax({
+            type: 'DELETE',
+            dataType: 'json',
+            url: '/transfers/' + el.attr("data-transfer-id")
+        });
+    });
+
+    $("#library").delegate(".delete", "click", function() {
+        if (!confirm("Are you sure you want to delete this?")) {
+            return;
+        }
+        var self = $(this);
+        var el = self.closest("li");
+        this.disabled = true;
+        self.addClass("disabled");
+        $.ajax({
+            type: 'DELETE',
+            dataType: 'json',
+            url: '/streams/' + el.attr("data-stream-id") + '/stream.m3u8'
         });
     });
 

@@ -83,6 +83,11 @@ class App < Sinatra::Base
     json({:status => "ok"})
   end
 
+  delete '/transfers/:id' do |id|
+    t = transfers.find(id)
+    transfers.delete t
+  end
+
   get '/streams' do
     json streams.all.select { |s| s.complete? }.map { |s| stream_to_hash s }
   end
@@ -91,6 +96,11 @@ class App < Sinatra::Base
     s = streams.find(id)
     file_name = File.join(File.dirname(s.path), s.id, "stream.m3u8")
     send_file file_name, :type => 'application/x-mpegURL', :disposition => 'inline'
+  end
+
+  delete '/streams/:id/stream.m3u8' do |id|
+    s = streams.find(id)
+    streams.delete s
   end
 
   get '/streams/:id/:segment.ts' do |id, segment|
