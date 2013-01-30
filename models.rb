@@ -32,8 +32,8 @@ module FFmpeg
 
   def self.segment(path_in, path_out, base_name = 'stream')
     FileUtils.mkdir_p(path_out)
-    #ffmpeg_bin = "ffmpeg"
-    ffmpeg_bin = "avconv"
+    ffmpeg_bin = `which avconv`.strip
+    ffmpeg_bin = `which ffmpeg`.strip if ffmpeg_bin.empty?
     cmd =<<-CMD.strip
       cd "#{path_out}" ; #{ffmpeg_bin} -v quiet -i "#{path_in}" -c:v libx264 -b:v 1024k -c:a libmp3lame -c:a copy -b:a 128k -vprofile baseline -level 13 -flags -global_header -map 0 -f segment -segment_time 4 -segment_list "#{base_name}.m3u8" -segment_format mpegts "#{base_name}%05d.ts"
     CMD
