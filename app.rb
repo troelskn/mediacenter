@@ -39,9 +39,11 @@ class App < Sinatra::Base
         encoding_complete, duration, progress = true, 0, 0
         t.movie_files.each do |m|
           s = streams.find_by_path(m)
-          encoding_complete = encoding_complete && s && s.complete?
-          duration += s.duration if s.duration
-          progress += s.progress if s.progress
+          if s
+            encoding_complete = encoding_complete && s.complete?
+            duration += s.duration if s.duration
+            progress += s.progress if s.progress
+          end
         end
         progress_percent = 100 - (((duration - progress) / duration.to_f) * 100).round if duration > 0
         status = encoding_complete ? 'complete' : 'encoding'

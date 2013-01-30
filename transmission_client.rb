@@ -1,6 +1,7 @@
 require 'net/http'
 require 'json'
 
+# https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt
 module TransmissionClient
 
   class Client
@@ -23,6 +24,10 @@ module TransmissionClient
 
     def stop(id)
       @connection.request('torrent-stop', {'ids' => [*id].map(&:to_i)})
+    end
+
+    def destroy!(id)
+      @connection.request('torrent-remove', {'ids' => [*id].map(&:to_i), 'delete-local-data' => true})
     end
 
     def session
@@ -111,6 +116,10 @@ module TransmissionClient
 
     def stop
       @connection.request('torrent-stop', {'ids' => @attributes['id']})
+    end
+
+    def destroy!
+      @connection.request('torrent-remove', {'ids' => @attributes['id'], 'delete-local-data' => true})
     end
 
     def status_name

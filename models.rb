@@ -59,6 +59,9 @@ class Streams
     def progress_percent
       100 - (((duration - progress) / duration.to_f) * 100).round if duration
     end
+    def data_folder_path
+      File.join(File.dirname(self.path), self.id)
+    end
   end
 
   def initialize(folder)
@@ -98,7 +101,11 @@ class Streams
   end
 
   def delete(stream)
-    raise "TODO"
+    puts "FileUtils.rm_rf #{stream.path}"
+    puts "FileUtils.rm_rf #{stream.data_folder_path}"
+
+    #FileUtils.rm_rf stream.path
+    #FileUtils.rm_rf stream.data_folder_path
   end
 
   private
@@ -139,7 +146,7 @@ class Encoder
       if s.initial?
         puts "Starting encoding of #{s.id}"
         @streams.save!(s, "encoding")
-        FFmpeg.segment(s.source, File.join(File.dirname(s.path), s.id), 'stream')
+        FFmpeg.segment(s.source, s.data_folder_path, 'stream')
         puts "Done encoding #{s.id}"
         @streams.save!(s, "complete")
       end
@@ -243,8 +250,8 @@ class Transfers
     @transmission_client.add_torrent_by_url(url)
   end
 
-  def delete(torrents)
-    raise "TODO"
+  def delete(transfer)
+    @transmission_client.torrents.find { |t| t.id == transfer.id }.destroy!
   end
 
   private
