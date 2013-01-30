@@ -25,9 +25,15 @@ module FFmpeg
 
   def self.probe(path)
     probe = `ffprobe "#{path}" 2>&1`
-    duration = probe.match(/Duration: ([^.]*)/)
+    match = probe.match(/Duration: ([0-9]{2}):([0-9]{2}):([0-9]{2})/)
+    if match
+      h, m, s = match[1].to_i, match[2].to_i, match[3].to_i
+      duration = (h * 3600) + (m * 60) + s
+    else
+      duration = nil
+    end
     title = probe.match(/title\s+: (.*)/)
-    ProbeResult.new(path, duration ? duration[1] : nil, title ? title[1] : nil)
+    ProbeResult.new(path, duration, title ? title[1] : nil)
   end
 
   def self.segment(path_in, path_out, base_name = 'stream')
@@ -43,13 +49,16 @@ end
 
 class Streams
 
-  class Stream < Struct.new(:id, :path, :source, :title, :status)
+  class Stream < Struct.new(:id, :path, :source, :title, :duration, :status, :progress)
     include HashableStruct
     def initial?
       self.status == "initial"
     end
     def complete?
       self.status == "complete"
+    end
+    def progress_percent
+      100 - (((duration - progress) / duration.to_f) * 100).round if duration
     end
   end
 
@@ -65,7 +74,7 @@ class Streams
                {}
              end
       id = File.basename(path, '.json')
-      Stream.new(id, path, meta["source"], meta["title"], meta["status"])
+      Stream.new(id, path, meta["source"], meta["title"], meta["duration"], meta["status"], get_progress("#{@folder}/#{id}"))
     end
   end
 
@@ -80,13 +89,17 @@ class Streams
   def create(source_path)
     id = make_id_from_path(source_path)
     probe = FFmpeg.probe(source_path)
-    Stream.new(id, "#{@folder}/#{id}.json", source_path, probe.name, "initial")
+    Stream.new(id, "#{@folder}/#{id}.json", source_path, probe.name, probe.duration, "initial", 0)
   end
 
   def save!(stream, status = nil)
     File.open(stream.path, 'w') do |f|
-      f.write(JSON.generate({"source" => stream.source, "title" => stream.title, "status" => status || stream.status}))
+      f.write(JSON.generate({"source" => stream.source, "title" => stream.title, "duration" => stream.duration, "status" => status || stream.status}))
     end
+  end
+
+  def delete(stream)
+    raise "TODO"
   end
 
   private
@@ -95,6 +108,11 @@ class Streams
     unique = File.join(File.basename(File.dirname(path)), File.basename(path))
     Digest::MD5.hexdigest(unique)
   end
+
+  def get_progress(path)
+    Dir.glob("#{path}/*.ts").count * 4
+  end
+
 end
 
 class Encoder

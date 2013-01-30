@@ -34,11 +34,19 @@ class App < Sinatra::Base
 
     def transfer_to_hash(t)
       status = t.status
-      if t.progress == 100
-        encoding_complete = t.movie_files.map { |m| s = streams.find_by_path(m) ; s && s.complete? }.reduce(true) { |a,b| a && b }
+      progress_percent = t.progress
+      if progress_percent
+        encoding_complete, duration, progress = true, 0, 0
+        t.movie_files.each do |m|
+          s = streams.find_by_path(m)
+          encoding_complete = encoding_complete && s && s.complete?
+          duration += s.duration if s.duration
+          progress += s.progress if s.progress
+        end
+        progress_percent = 100 - (((duration - progress) / duration.to_f) * 100).round if duration > 0
         status = encoding_complete ? 'complete' : 'encoding'
       end
-      t.to_map.merge({:status => status})
+      t.to_map.merge({:status => status, :progress => progress_percent})
     end
 
     def stream_to_hash(s)
