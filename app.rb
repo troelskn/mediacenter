@@ -35,7 +35,8 @@ class App < Sinatra::Base
     def transfer_to_hash(t)
       status = t.status
       progress_percent = t.progress
-      if progress_percent
+      if progress_percent > 0
+        # TODO: This only makes sense once download has completed ..
         encoding_complete, duration, progress = true, 0, 0
         t.movie_files.each do |m|
           s = streams.find_by_path(m)
