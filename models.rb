@@ -36,13 +36,15 @@ module FFmpeg
     ProbeResult.new(path, duration, title ? title[1] : nil)
   end
 
-  def self.segment(path_in, path_out, base_name = 'stream')
+  # log_level -> quiet panic fatal error warning info verbose debug
+  def self.segment(path_in, path_out, base_name = 'stream', log_level = 'quiet')
     FileUtils.mkdir_p(path_out)
     ffmpeg_bin = `which ffmpeg`.strip
     cmd =<<-CMD.strip
-      cd "#{path_out}" ; #{ffmpeg_bin} -v quiet -i "#{path_in}" -c:v libx264 -b:v 1024k -c:a libmp3lame -b:a 128k -vprofile baseline -level 13 -flags -global_header -map 0 -f segment -segment_time 4 -segment_list_size 9999 -segment_list "#{base_name}.m3u8" -segment_format mpegts "#{base_name}%05d.ts"
+      cd "#{path_out}" ; #{ffmpeg_bin} -v #{log_level} -i "#{path_in}" -c:v libx264 -b:v 1024k -c:a libmp3lame -b:a 128k -vprofile baseline -level 13 -flags -global_header -map 0:0 -map 0:1 -f segment -segment_time 4 -segment_list_size 9999 -segment_list "#{base_name}.m3u8" -segment_format mpegts "#{base_name}%05d.ts"
     CMD
-    `#{cmd}`
+    puts "* #{cmd}" unless log_level == 'quiet'
+    system(cmd)
   end
 end
 
