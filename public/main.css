@@ -10,17 +10,17 @@ li .controls {display:none}
 li.selected .controls {display:block;padding-top:20px}
 li.selected {background:#666;color:#fff}
 
-.button {display:inline-block;text-decoration:none;font-family:Helvetica;text-transform:uppercase;font-size:28px;font-weight:bold;padding:14px 28px;border:0;background:#009cff;color:#fff;text-align:center;border-radius:1px;margin-right:20px;cursor:pointer}
+.button {display:inline-block;text-decoration:none;font-family:Helvetica;text-transform:uppercase;font-size:28px;font-weight:bold;padding:14px 28px;border:0;background:#009cff;color:#fff;text-align:center;border-radius:2px;margin-right:20px;cursor:pointer}
 .button.play {background:yellow;color:#333}
 .button.cancel {background:#ccc;color:#fff}
 .button.delete {background:#f00;color:#fcc}
 li .stop, li .start, li .play, li.encoding .delete, li.encoding .info {display:none}
 li.paused .start, li.active .stop, li.complete .play {display:inline-block}
-.textfield {display:inline-block;font-family:Helvetica;font-size:28px;padding:14px;border:1px solid #ccc;color:#333;border-radius:1px;margin-right:20px}
+.textfield {display:inline-block;font-family:Helvetica;font-size:28px;padding:14px;border:1px solid #ccc;color:#333;border-radius:2px;margin-right:20px}
 .button.disabled {background:#ccc;color:#fff}
 
 #header {position:fixed;top:0;left:0;z-index:5;width:100%;box-sizing:border-box;overflow:hidden;height:80px;padding:0 20px;background-color:#fff;padding-bottom:20px}
-#header .button {float:left;box-sizing:border-box;width:50%;text-align:center;height:60px;line-height:60px;font-family:Helvetica;text-transform:uppercase;font-size:28px;font-weight:bold;padding:0;margin:0;background-color:#fff;color:#333}
+#header .button {float:left;box-sizing:border-box;width:50%;text-align:center;height:60px;line-height:60px;font-family:Helvetica;text-transform:uppercase;font-size:28px;font-weight:bold;padding:0;margin:0;background-color:#fff;color:#333;border-top-left-radius:0;border-top-right-radius:0}
 #header .button.selected {background:#009cff;color:#fff}
 
 #toolbar {position:fixed;bottom:0;right:0}
