@@ -103,11 +103,10 @@ class Streams
   end
 
   def delete(stream)
-    puts "FileUtils.rm_rf #{stream.path}"
-    puts "FileUtils.rm_rf #{stream.data_folder_path}"
-
-    #FileUtils.rm_rf stream.path
-    #FileUtils.rm_rf stream.data_folder_path
+    #puts "FileUtils.rm_rf #{stream.path}"
+    #puts "FileUtils.rm_rf #{stream.data_folder_path}"
+    save! stream, "deleted"
+    FileUtils.rm_rf stream.data_folder_path
   end
 
   private

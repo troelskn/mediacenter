@@ -15,6 +15,10 @@ $(document).ready(function() {
         return $("#transfers li[data-transfer-id]");
     };
 
+    var selectStreamItems = function() {
+        return $("#library li[data-stream-id]");
+    };
+
     var updateTransferItem = function(item) {
         var dom = $("[data-transfer-id=" + item.id + "]");
         if (!dom.get(0)) {
@@ -27,6 +31,11 @@ $(document).ready(function() {
         dom.find(".name").text(item.name);
         dom.find(".status").text(item.status);
         dom.find(".info").text(["up " + Math.round(item.up / 1024) + " K", "down " + Math.round(item.down / 1024) + " K", item.eta].join(" / "));
+        if (item.status == "encoding") {
+            dom.addClass("encoding");
+        } else {
+            dom.removeClass("encoding");
+        }
         if (item.status == "download") {
             dom.addClass("active");
         } else {
@@ -84,9 +93,16 @@ $(document).ready(function() {
             dataType: 'json',
             url: '/streams',
             success: function(data) {
+                var foundIds = [];
                 $(data).each(function(_,item) {
+                    foundIds.push(item.id);
                     updateStreamItem(item);
                 });
+                var removedItems = selectStreamItems().not(function() {
+                    return $.inArray($(this).attr("data-stream-id"), foundIds) > -1;
+                });
+                removedItems.remove();
+                reflow();
             }
         });
     };
