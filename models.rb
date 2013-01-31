@@ -148,7 +148,7 @@ class Encoder
       if s.initial?
         puts "Starting encoding of #{s.id}"
         @streams.save!(s, "encoding")
-        FFmpeg.segment(s.source, s.data_folder_path, 'stream')
+        FFmpeg.segment(s.source, s.data_folder_path, 'stream', 'error')
         puts "Done encoding #{s.id}"
         @streams.save!(s, "complete")
       end
