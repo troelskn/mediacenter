@@ -37,11 +37,11 @@ class App < Sinatra::Base
       progress_percent = t.progress
       if progress_percent > 0
         # TODO: This only makes sense once download has completed ..
-        encoding_complete, duration, progress = true, 0, 0
+        encoding_complete, duration, progress = nil, 0, 0
         t.movie_files.each do |m|
           s = streams.find_by_path(m)
           if s
-            encoding_complete = encoding_complete && s.complete?
+            encoding_complete = (encoding_complete.nil? || encoding_complete) && s.complete?
             duration += s.duration if s.duration
             progress += s.progress if s.progress
           end
