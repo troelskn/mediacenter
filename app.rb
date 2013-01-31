@@ -46,8 +46,10 @@ class App < Sinatra::Base
             progress += s.progress if s.progress
           end
         end
-        progress_percent = 100 - (((duration - progress) / duration.to_f) * 100).round if duration > 0
-        status = encoding_complete ? 'complete' : 'encoding'
+        unless encoding_complete.nil?
+          progress_percent = 100 - (((duration - progress) / duration.to_f) * 100).round if duration > 0
+          status = encoding_complete ? 'complete' : 'encoding'
+        end
       end
       t.to_map.merge({:status => status, :progress => progress_percent})
     end
