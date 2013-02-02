@@ -177,7 +177,7 @@ class Movies
     Thread.new do
       while true
         begin
-          paths = Dir.glob("#{@folder}/**/*").select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv)$/) }.map { |f| Pathname.new(f) }
+          paths = Dir.glob("#{@folder}/**/*").select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv|mp4)$/) }.map { |f| Pathname.new(f) }
           @movies = paths.map do |path|
             probe = FFmpeg.probe(path)
             rel_path = File.join(path.dirname.basename, path.basename)
