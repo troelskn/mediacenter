@@ -224,4 +224,45 @@ $(document).ready(function() {
             }
         });
     });
+
+
+    $("#library").delegate(".rename-toggle", "click", function(event) {
+        event.stopPropagation();
+        var self = $(this);
+        var el = self.closest("li");
+        el.find(".rename-stream-text").val(el.find(".name").text());
+        el.find(".default-stream-container").hide();
+        el.find(".rename-stream-container").show();
+    });
+
+    $("#library").delegate(".rename-stream-container", "click", function(event) {
+        event.stopPropagation();
+    });
+
+    $("#library").delegate(".rename-stream-cancel", "click", function(event) {
+        var self = $(this);
+        var el = self.closest("li");
+        el.find(".default-stream-container").show();
+        el.find(".rename-stream-container").hide();
+    });
+
+    $("#library").delegate(".rename-stream-submit", "click", function(event) {
+        var self = $(this);
+        var el = self.closest("li");
+        var name = el.find(".rename-stream-text").val();
+        el.find(".default-stream-container").show();
+        el.find(".rename-stream-container").hide();
+        el.find(".rename-toggle").addClass("disabled").get(0).disabled = true;
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: '/streams/' + el.attr("data-stream-id") + '/stream.m3u8',
+            data: {title: name},
+            success: function() {
+                el.find(".name").text(name);
+                el.find(".rename-toggle").removeClass("disabled").get(0).disabled = false;
+            }
+        });
+    });
+
 });

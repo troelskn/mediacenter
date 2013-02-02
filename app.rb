@@ -103,6 +103,13 @@ class App < Sinatra::Base
     send_file file_name, :type => 'application/x-mpegURL', :disposition => 'inline'
   end
 
+  post '/streams/:id/stream.m3u8' do |id|
+    raise "No title given" if params[:title].strip.empty?
+    s = streams.find(id)
+    s.title = params[:title]
+    streams.save! s
+  end
+
   delete '/streams/:id/stream.m3u8' do |id|
     s = streams.find(id)
     streams.delete s

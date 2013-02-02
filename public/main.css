@@ -31,3 +31,5 @@ li.paused .start, li.active .stop, li.complete .play {display:inline-block}
 #toolbar {position:fixed;bottom:0;right:0}
 #toolbar button {}
 #add-transfer-container {display:none}
+
+.rename-stream-container {display:none}
