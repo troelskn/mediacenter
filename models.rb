@@ -19,7 +19,7 @@ module FFmpeg
   class ProbeResult < Struct.new(:path, :duration, :title)
     include HashableStruct
     def name
-      self.title || (self.path.dirname.basename.to_s + "/" + self.path.basename.to_s)
+      self.title
     end
   end
 
@@ -33,7 +33,12 @@ module FFmpeg
       duration = nil
     end
     title = probe.match(/title\s+: (.*)/)
-    ProbeResult.new(path, duration, title ? title[1] : nil)
+    if title
+      title = title[1]
+    else
+      title = (path.dirname.basename.to_s + "/" + path.basename.to_s)
+    end
+    ProbeResult.new(path, duration, title)
   end
 
   # log_level -> quiet panic fatal error warning info verbose debug
@@ -216,7 +221,7 @@ class Transfers
 
     def movie_files
       folder = File.join(self.download_dir, self.name)
-      Dir.glob("#{folder}/**/*").select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv)$/) }.map { |f| Pathname.new(f) }
+      [folder, *Dir.glob("#{folder}/**/*")].select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv|mp4)$/) }.map { |f| Pathname.new(f) }
     end
 
     private
