@@ -158,6 +158,17 @@ class Encoder
       end
     end
   end
+
+  def remove_completed
+    @transfers.all.each do |t|
+      if t.progress == 100
+        files = t.movie_files
+        if files.any? && (files.all? {|m| s = @streams.find_by_path(m) ; s && s.complete? })
+          puts "Transfer completed - #{t.name}"
+        end
+      end
+    end
+  end
 end
 
 class Movies

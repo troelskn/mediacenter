@@ -8,5 +8,6 @@ encoder = Encoder.new(transfers, streams)
 while true
   encoder.queue_transfers
   encoder.encode_streams
+  encoder.remove_completed
   sleep 10
 end
