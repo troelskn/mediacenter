@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+APPLICATION_ROOT=/var/www/mediacenter/
+PID_FILE=$APPLICATION_ROOT/mediacenter-web.pid
+
+function stop_job {
+    echo "Stopping mediacenter-web"
+    PID=$([ -f $PID_FILE ] && cat $PID_FILE)
+    [ $PID ] && kill -9 $PID
+    rm $PID_FILE
+    echo "Stopped"
+}
+
+function start_job {
+    if [ -f $PID_FILE ]
+    then
+        stop_job
+    fi
+    echo "Starting mediacenter-web"
+    pushd $APPLICATION_ROOT
+    nohup rackup &
+    PID=$!
+    echo $PID > $PID_FILE
+    popd
+    echo "Started"
+}
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+    start)
+        start_job
+        ;;
+    stop)
+        stop_job
+        ;;
+    *)
+        echo "Usage: /etc/init.d/$0 {start|stop}"
+        exit 1
+        ;;
+esac
+
+exit 0
