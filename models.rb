@@ -165,6 +165,7 @@ class Encoder
         files = t.movie_files
         if files.any? && (files.all? {|m| s = @streams.find_by_path(m) ; s && s.complete? })
           puts "Transfer completed - #{t.name}"
+          @transfers.delete t
         end
       end
     end
