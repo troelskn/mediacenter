@@ -149,7 +149,7 @@ class Encoder
 
   def encode_streams
     @streams.all.each do |s|
-      if s.initial?
+      if s.initial? && File.exist?(s.source) # Must check for file exists, because they may be a delay after transmission completes
         puts "Starting encoding of #{s.id}"
         @streams.save!(s, "encoding")
         FFmpeg.segment(s.source, s.data_folder_path, 'stream', 'error')
