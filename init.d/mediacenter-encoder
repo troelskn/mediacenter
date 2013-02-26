@@ -1,5 +1,15 @@
 #!/bin/bash
-#
+
+### BEGIN INIT INFO
+# Provides:          mediacenter-encoder
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Transcode movies in the background.
+# Description: Background worker for transcoding downloaded movies.
+### END INIT INFO
+
 APPLICATION_ROOT=/var/www/mediacenter/
 PID_FILE=$APPLICATION_ROOT/mediacenter-encoder.pid
 
