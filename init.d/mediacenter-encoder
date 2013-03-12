@@ -10,7 +10,7 @@
 # Description: Background worker for transcoding downloaded movies.
 ### END INIT INFO
 
-APPLICATION_ROOT=/var/www/mediacenter/
+APPLICATION_ROOT=/var/www/mediacenter
 PID_FILE=$APPLICATION_ROOT/mediacenter-encoder.pid
 
 function stop_job {
@@ -28,7 +28,7 @@ function start_job {
     fi
     echo "Starting mediacenter-encoder"
     pushd $APPLICATION_ROOT
-    nohup ruby encoder.rb &
+    nohup ruby encoder.rb 2>&1 1>$APPLICATION_ROOT/encoder.log &
     PID=$!
     echo $PID > $PID_FILE
     popd
