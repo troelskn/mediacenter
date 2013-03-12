@@ -94,7 +94,7 @@ class App < Sinatra::Base
   end
 
   get '/streams' do
-    json streams.all.select { |s| s.complete? }.map { |s| stream_to_hash s }
+    json streams.all.select { |s| s.complete? }.map { |s| stream_to_hash s }.sort_by {|s| s[:title] }
   end
 
   get '/streams/:id/stream.m3u8' do |id|
