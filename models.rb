@@ -233,7 +233,14 @@ class Transfers
 
     def movie_files
       folder = File.join(self.download_dir, self.name)
-      [folder, *Dir.chdir(folder) { Dir.glob("**/*").map {|path| File.expand_path(path) } }].select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv|mp4)$/) }.map { |f| Pathname.new(f) }
+      if File.directory?(folder)
+        files = [folder] + Dir.chdir(folder) {
+          Dir.glob("**/*").map {|path| File.expand_path(path) }
+        }
+      else
+        files = [folder]
+      end
+      files.select { |f| f.match(/(avi|mkv|mpg|mpeg|wmv|mp4)$/) }.map { |f| Pathname.new(f) }
     end
 
     private
