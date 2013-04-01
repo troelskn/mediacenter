@@ -11,7 +11,7 @@ module TransmissionClient
 
     def torrents
       response = @connection.request('torrent-get', {'fields' => Torrent::ATTRIBUTES})
-      response['torrents'].map { |t| Torrent.new(t, @connection) }
+      response ? response['torrents'].map { |t| Torrent.new(t, @connection) } : []
     end
 
     def add_torrent_by_url(url)
