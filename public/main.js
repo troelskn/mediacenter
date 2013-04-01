@@ -125,7 +125,7 @@ $(document).ready(function() {
             var selected = el.hasClass("selected");
             $("ul li").removeClass("selected");
             if (!selected) {
-                el.addClass("selected").find(".controls").each(function() { this.scrollIntoView(); });
+                el.addClass("selected"); //.find(".controls").each(function() { this.scrollIntoView(); });
             }
         }
     });
