@@ -10,21 +10,21 @@ namespace :streams do
     desc "List all streams"
     task :all do
       streams.all.each do |s|
-        puts "#{s.id} #{s.status} #{s.title}"
+        puts s.inspect
       end
     end
 
     desc "List streams with status deleted"
     task :deleted do
       streams.all.select{|s| s.status == "deleted" }.each do |s|
-        puts "#{s.id} #{s.status} #{s.title}"
+        puts s.inspect
       end
     end
 
     desc "List streams with status encoding"
     task :encoding do
       streams.all.select{|s| s.status == "encoding" }.each do |s|
-        puts "#{s.id} #{s.status} #{s.title}"
+        puts s.inspect
       end
     end
   end

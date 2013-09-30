@@ -70,6 +70,9 @@ class Streams
     def data_folder_path
       File.join(File.dirname(self.path), self.id)
     end
+    def inspect
+      "#{id} [#{status}:#{progress_percent}] #{title}"
+    end
   end
 
   def initialize(folder)
